@@ -1,0 +1,6 @@
+{
+  "name": "Muhammad Ahmad Portfolio",
+  "description": "Professional portfolio for Muhammad Ahmad, Agentic AI Developer specializing in autonomous AI agents, n8n workflow automation, and backend integrations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
