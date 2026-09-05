@@ -52,13 +52,15 @@ import {
    1. EDITABLE CONSTANTS & PLACEHOLDER CONFIGURATION
    ========================================================================= */
 
-// TODO: Replace with your actual contact information and social handles
+// Contact information and verified profiles
 const PROFILE = {
   name: 'Muhammad Ahmad',
   title: 'Agentic AI Developer',
   email: 'muhammadahma5858@gmail.com',
   whatsappNumber: '+92 370 6357435',
   whatsappUrl: 'https://wa.me/923706357435',
+  githubUrl: 'https://github.com/muhammadahmad5858',
+  githubUsername: 'muhammadahmad5858',
   
   // Tagline (editable)
   tagline: 'I design and build autonomous AI agents and automation systems that save businesses time and money.',
@@ -66,11 +68,10 @@ const PROFILE = {
   // Professional Bio (editable, ~3-4 sentences)
   bio: 'I am an Agentic AI Developer specializing in architecting autonomous AI agents, resilient workflow automations, and scalable backend integrations. I partner with forward-thinking businesses and digital agencies to eliminate repetitive tasks and turn manual bottlenecks into intelligent, self-healing systems. By uniting state-of-the-art LLM reasoning with tools like n8n, webhooks, and custom APIs, I deliver reliable digital workers tailored to your exact business operations.',
 
-  // Social Links Placeholders
-  // TODO: Replace '#' with your actual profile URLs
+  // Social Links
   socials: {
     linkedin: '#', // TODO: Add your LinkedIn profile URL (e.g., https://linkedin.com/in/muhammad-ahmad)
-    github: '#',   // TODO: Add your GitHub profile URL (e.g., https://github.com/muhammadahmad)
+    github: 'https://github.com/muhammadahmad5858',
     upwork: '#',   // TODO: Add your Upwork profile URL
     fiverr: '#',   // TODO: Add your Fiverr profile URL
   },
@@ -351,6 +352,11 @@ const SIMULATED_KNOWLEDGE_BASE: { keywords: string[]; response: string }[] = [
     response:
       'Muhammad works with n8n, Node.js, Python, REST APIs, Webhooks, SQL/PostgreSQL, Supabase, Firebase, Vector DBs, LangChain/agent frameworks, Git, and Docker.',
   },
+  {
+    keywords: ['github', 'git', 'repo', 'code', 'repository', 'open source', 'projects'],
+    response:
+      'You can explore Muhammad\'s public repositories, agent implementations, and code at https://github.com/muhammadahmad5858 (@muhammadahmad5858).',
+  },
 ];
 
 /* =========================================================================
@@ -378,6 +384,7 @@ export default function App() {
   // Contact section copied tooltip indicators
   const [copiedEmail, setCopiedEmail] = useState<boolean>(false);
   const [copiedPhone, setCopiedPhone] = useState<boolean>(false);
+  const [copiedGithub, setCopiedGithub] = useState<boolean>(false);
 
   // Interactive message composer state in Contact section
   const [contactFormService, setContactFormService] = useState<string>('Agentic AI Development');
@@ -449,14 +456,17 @@ export default function App() {
   };
 
   // Copy helpers
-  const handleCopy = (text: string, type: 'email' | 'phone') => {
+  const handleCopy = (text: string, type: 'email' | 'phone' | 'github') => {
     navigator.clipboard.writeText(text);
     if (type === 'email') {
       setCopiedEmail(true);
       setTimeout(() => setCopiedEmail(false), 2200);
-    } else {
+    } else if (type === 'phone') {
       setCopiedPhone(true);
       setTimeout(() => setCopiedPhone(false), 2200);
+    } else if (type === 'github') {
+      setCopiedGithub(true);
+      setTimeout(() => setCopiedGithub(false), 2200);
     }
   };
 
@@ -611,8 +621,26 @@ export default function App() {
             ))}
           </nav>
 
-          {/* Action Area: Theme Toggle & Hire Me CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Action Area: GitHub, Theme Toggle & Hire Me CTA */}
+          <div className="hidden md:flex items-center gap-2.5">
+            {/* GitHub Profile Link */}
+            <a
+              id="navbar-github-btn"
+              href={PROFILE.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`px-3 py-2 rounded-2xl border transition-all duration-200 flex items-center gap-1.5 ${
+                isDark
+                  ? 'bg-slate-900/80 border-slate-800 text-slate-300 hover:text-white hover:border-teal-500/40 hover:bg-slate-800'
+                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200 hover:text-slate-900'
+              }`}
+              aria-label="GitHub Profile (muhammadahmad5858)"
+              title="GitHub: muhammadahmad5858"
+            >
+              <Github className="w-4 h-4 text-teal-400" />
+              <span className="text-xs font-mono font-medium">GitHub</span>
+            </a>
+
             {/* Dark / Light Toggle Switch */}
             <button
               id="theme-toggle-btn"
@@ -643,6 +671,17 @@ export default function App() {
 
           {/* Mobile Menu & Theme Toggle for Small Screens */}
           <div className="flex md:hidden items-center gap-2">
+            <a
+              href={PROFILE.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`p-2 rounded-xl border ${
+                isDark ? 'bg-slate-900 border-slate-800 text-teal-400' : 'bg-slate-100 border-slate-200 text-slate-700'
+              }`}
+              aria-label="GitHub profile"
+            >
+              <Github className="w-4 h-4" />
+            </a>
             <button
               onClick={() => setIsDark(!isDark)}
               className={`p-2 rounded-xl border ${
@@ -693,7 +732,18 @@ export default function App() {
                     {item.label}
                   </button>
                 ))}
-                <div className="pt-2 border-t border-slate-800/40 mt-1">
+                <div className="pt-2 border-t border-slate-800/40 mt-1 flex flex-col gap-2">
+                  <a
+                    href={PROFILE.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-2xl text-sm font-semibold border ${
+                      isDark ? 'bg-slate-900/80 border-slate-800 text-slate-200' : 'bg-slate-100 border-slate-200 text-slate-800'
+                    }`}
+                  >
+                    <Github className="w-4 h-4 text-teal-400" />
+                    <span>GitHub: muhammadahmad5858</span>
+                  </a>
                   <a
                     href={PROFILE.whatsappUrl}
                     target="_blank"
@@ -763,7 +813,7 @@ export default function App() {
                 {PROFILE.tagline}
               </p>
 
-              {/* CTAs: WhatsApp & View My Work */}
+              {/* CTAs: WhatsApp, View My Work & GitHub */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
                 <a
                   id="hero-whatsapp-cta"
@@ -790,6 +840,23 @@ export default function App() {
                   <span>View My Work</span>
                   <ChevronRight className="w-4 h-4 opacity-75" />
                 </button>
+
+                <a
+                  id="hero-github-btn"
+                  href={PROFILE.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl font-semibold border transition-all ${
+                    isDark
+                      ? 'bg-slate-900/80 border-slate-800 text-slate-300 hover:text-teal-300 hover:border-teal-500/40 hover:bg-slate-900'
+                      : 'bg-white border-slate-200 text-slate-700 hover:text-teal-700 hover:bg-slate-50 hover:border-teal-500/40 shadow-sm'
+                  }`}
+                  aria-label="GitHub Profile: muhammadahmad5858"
+                >
+                  <Github className="w-5 h-5 text-teal-400" />
+                  <span>GitHub</span>
+                  <ArrowUpRight className="w-4 h-4 opacity-75" />
+                </a>
               </div>
 
               {/* Quick Trust / Tech Pills */}
@@ -1185,9 +1252,39 @@ export default function App() {
             ))}
           </div>
 
+          {/* GitHub Repositories Banner */}
+          <div
+            className={`mb-8 p-4 rounded-3xl border flex flex-col sm:flex-row items-center justify-between gap-4 max-w-3xl mx-auto ${
+              isDark ? 'bg-teal-500/5 border-teal-500/30' : 'bg-teal-50/60 border-teal-200'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-teal-500/15 border border-teal-500/30 flex items-center justify-center text-teal-400 shrink-0">
+                <Github className="w-5 h-5" />
+              </div>
+              <div className="text-center sm:text-left">
+                <p className="text-sm font-semibold">Explore My Code & Open-Source Projects</p>
+                <p className={`text-xs font-mono ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Follow my agent architectures and workflows on GitHub:{' '}
+                  <span className="text-teal-400 font-semibold">@{PROFILE.githubUsername}</span>
+                </p>
+              </div>
+            </div>
+            <a
+              id="projects-github-cta"
+              href={PROFILE.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-teal-500/40 text-teal-300 hover:text-teal-200 text-xs font-mono font-semibold transition-all shrink-0 shadow-sm"
+            >
+              <span>View GitHub Repos</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
           {/* Notice to Muhammad about Placeholders */}
           <div className="mb-8 p-3.5 rounded-2xl border border-dashed border-teal-500/40 bg-teal-500/5 text-center text-xs font-mono text-teal-300 max-w-2xl mx-auto">
-            ⚡ Note for Muhammad: These 4 cards are placeholder projects ready to be replaced with your real client case studies and portfolio links.
+            ⚡ Note for Muhammad: These 4 cards are placeholder projects ready to be customized with your specific repository URLs or client case studies.
           </div>
 
           {/* Projects Grid */}
@@ -1279,30 +1376,20 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* View Details Action Link */}
-                    {/* ================================================================
-                        TODO: LINK TO REAL PROJECT REPO / CASE STUDY
-                        Replace href="#" with your actual project demo URL or GitHub repository.
-                        ================================================================ */}
+                    {/* View Details / GitHub Action Link */}
                     <div className="pt-4 border-t border-slate-700/30 flex items-center justify-between">
                       <a
-                        href={project.link}
-                        onClick={(e) => {
-                          if (project.link === '#') {
-                            e.preventDefault();
-                            alert(
-                              `"${project.title}" is a placeholder project card. You can edit the link in App.tsx!`
-                            );
-                          }
-                        }}
+                        href={project.link === '#' ? PROFILE.githubUrl : project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-teal-400 hover:text-teal-300 transition-colors"
                       >
-                        <span>View Details</span>
-                        <ExternalLink className="w-4 h-4" />
+                        <Github className="w-4 h-4" />
+                        <span>{project.link === '#' ? 'View on GitHub' : 'View Details'}</span>
+                        <ExternalLink className="w-3.5 h-3.5 opacity-75" />
                       </a>
                       <span className="text-[10px] font-mono text-slate-500">
-                        {/* Placeholder Indicator */}
-                        Placeholder
+                        {project.link === '#' ? 'Open Source' : 'Case Study'}
                       </span>
                     </div>
                   </div>
@@ -1546,6 +1633,38 @@ export default function App() {
                       <span>{copiedPhone ? 'Copied!' : 'Copy'}</span>
                     </button>
                   </div>
+
+                  {/* GitHub row with visit and copy buttons */}
+                  <div
+                    className={`p-3.5 rounded-2xl border flex items-center justify-between text-xs font-mono ${
+                      isDark ? 'bg-slate-900/70 border-slate-800' : 'bg-slate-100 border-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <Github className="w-4 h-4 text-teal-400 shrink-0" />
+                      <span className="truncate">github.com/{PROFILE.githubUsername}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 ml-2 shrink-0">
+                      <a
+                        href={PROFILE.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2.5 py-1 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 flex items-center gap-1 transition-colors"
+                        title="Visit GitHub profile"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Visit</span>
+                      </a>
+                      <button
+                        onClick={() => handleCopy(PROFILE.githubUrl, 'github')}
+                        className="px-2.5 py-1 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 flex items-center gap-1 transition-colors"
+                        title="Copy GitHub URL"
+                      >
+                        {copiedGithub ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedGithub ? 'Copied!' : 'Copy'}</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -1685,16 +1804,20 @@ export default function App() {
 
                 {/* GitHub */}
                 <a
-                  href={PROFILE.socials.github}
+                  id="footer-github-btn"
+                  href={PROFILE.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`p-2.5 rounded-2xl border transition-colors ${
-                    isDark ? 'bg-slate-900/80 border-slate-800 text-slate-300 hover:text-teal-400 hover:border-teal-500/40' : 'bg-white border-slate-200 text-slate-700 hover:text-teal-600'
+                  className={`p-2.5 rounded-2xl border transition-colors flex items-center gap-1.5 ${
+                    isDark
+                      ? 'bg-slate-900/80 border-slate-800 text-slate-300 hover:text-teal-400 hover:border-teal-500/40'
+                      : 'bg-white border-slate-200 text-slate-700 hover:text-teal-600'
                   }`}
-                  aria-label="GitHub profile placeholder"
-                  title="GitHub (TODO: Add link in App.tsx)"
+                  aria-label="GitHub profile: muhammadahmad5858"
+                  title="GitHub: https://github.com/muhammadahmad5858"
                 >
                   <Github className="w-4 h-4" />
+                  <span className="font-mono text-[11px] hidden sm:inline">github.com/{PROFILE.githubUsername}</span>
                 </a>
 
                 {/* Upwork Placeholder Badge */}
@@ -1818,6 +1941,7 @@ export default function App() {
                 {[
                   'What services do you offer?',
                   'Can you build n8n workflows?',
+                  'What is your GitHub?',
                   'How can I hire Muhammad?',
                 ].map((chip, cIdx) => (
                   <button
