@@ -45,7 +45,10 @@ import {
   UserCheck,
   ArrowRight,
   Linkedin,
-  Github
+  Github,
+  Camera,
+  UploadCloud,
+  RotateCcw
 } from 'lucide-react';
 
 /* =========================================================================
@@ -61,6 +64,7 @@ const PROFILE = {
   whatsappUrl: 'https://wa.me/923706357435',
   githubUrl: 'https://github.com/muhammadahmad5858',
   githubUsername: 'muhammadahmad5858',
+  defaultPhotoUrl: '/77867.jpeg',
   
   // Tagline (editable)
   tagline: 'I design and build autonomous AI agents and automation systems that save businesses time and money.',
@@ -391,6 +395,39 @@ export default function App() {
   const [contactFormName, setContactFormName] = useState<string>('');
   const [contactFormDetails, setContactFormDetails] = useState<string>('');
 
+  // User's Real Photo management (using exact user image 77867.jpeg without AI modification)
+  const [userPhoto, setUserPhoto] = useState<string>(() => {
+    return localStorage.getItem('muhammad_real_photo') || PROFILE.defaultPhotoUrl;
+  });
+  const [photoLoadError, setPhotoLoadError] = useState<boolean>(false);
+  const [photoUploadSuccess, setPhotoUploadSuccess] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        setUserPhoto(dataUrl);
+        setPhotoLoadError(false);
+        try {
+          localStorage.setItem('muhammad_real_photo', dataUrl);
+        } catch (err) {
+          console.warn('Storage quota', err);
+        }
+        setPhotoUploadSuccess('Exact photo applied across your entire portfolio!');
+        setTimeout(() => setPhotoUploadSuccess(null), 4000);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleTriggerUpload = () => {
+    fileInputRef.current?.click();
+  };
+
   // Floating AI Assistant Widget state (Step 8)
   const [chatWidgetOpen, setChatWidgetOpen] = useState<boolean>(false);
   const [chatMessages, setChatMessages] = useState<Array<{ sender: 'ai' | 'user'; text: string; time: string }>>([
@@ -528,6 +565,31 @@ export default function App() {
         isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
       } relative overflow-x-hidden`}
     >
+      {/* Hidden File Input for uploading exact photo */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handlePhotoFileChange}
+        className="hidden"
+        id="exact-photo-file-input"
+      />
+
+      {/* Toast Notification for Exact Photo Update */}
+      <AnimatePresence>
+        {photoUploadSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl bg-teal-500 text-slate-950 font-bold text-xs sm:text-sm flex items-center gap-2.5 shadow-2xl shadow-teal-500/40 border border-teal-300"
+          >
+            <CheckCircle2 className="w-4 h-4 text-slate-950" />
+            <span>{photoUploadSuccess}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Background Ambient Glow & Geometric Balance Grid */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div
@@ -577,14 +639,32 @@ export default function App() {
             className="flex items-center gap-2.5 group focus:outline-none"
             aria-label="Muhammad Ahmad Home"
           >
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-teal-400 via-blue-600 to-indigo-600 p-[1.5px] shadow-md shadow-teal-500/20 group-hover:shadow-teal-400/30 transition-all">
-              <div
-                className={`w-full h-full rounded-[14px] flex items-center justify-center font-bold text-sm tracking-wider ${
-                  isDark ? 'bg-slate-950 text-white' : 'bg-white text-teal-600'
-                }`}
-              >
-                MA
-              </div>
+            <div
+              className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-teal-400 via-blue-600 to-indigo-600 p-[1.5px] shadow-md shadow-teal-500/20 group-hover:shadow-teal-400/30 transition-all overflow-hidden shrink-0"
+              onClick={(e) => {
+                // If user clicks on avatar in navbar, also let them trigger photo picker
+                e.stopPropagation();
+                handleTriggerUpload();
+              }}
+              title="Click to set/update your exact photo"
+            >
+              {!photoLoadError ? (
+                <img
+                  src={userPhoto}
+                  alt={PROFILE.name}
+                  onError={() => setPhotoLoadError(true)}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover object-top rounded-[14px]"
+                />
+              ) : (
+                <div
+                  className={`w-full h-full rounded-[14px] flex items-center justify-center font-bold text-xs ${
+                    isDark ? 'bg-slate-950 text-teal-400' : 'bg-white text-teal-600'
+                  }`}
+                >
+                  MA
+                </div>
+              )}
             </div>
             <div>
               <span className="font-bold tracking-tight text-lg sm:text-xl flex items-center gap-1.5 font-heading">
@@ -909,30 +989,84 @@ export default function App() {
                       ? 'bg-slate-900/90 border-slate-800 shadow-black/60'
                       : 'bg-white/90 border-slate-200 shadow-teal-500/10'
                   }`}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const file = e.dataTransfer.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        const dataUrl = ev.target?.result as string;
+                        if (dataUrl) {
+                          setUserPhoto(dataUrl);
+                          setPhotoLoadError(false);
+                          try {
+                            localStorage.setItem('muhammad_real_photo', dataUrl);
+                          } catch (err) {
+                            console.warn('Storage quota', err);
+                          }
+                          setPhotoUploadSuccess('Exact photo applied across your entire portfolio!');
+                          setTimeout(() => setPhotoUploadSuccess(null), 4000);
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
                 >
-                  {/* Stylized Modern Avatar Placeholder */}
-                  <div className="w-full h-full rounded-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex flex-col items-center justify-center relative overflow-hidden border border-teal-500/20">
-                    {/* Circuit Background Pattern */}
-                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#2dd4bf_1px,transparent_1px)] [background-size:16px_16px]" />
+                  {/* Real Portrait Photo or Direct Upload Fallback */}
+                  <div className="w-full h-full rounded-full relative overflow-hidden border-2 border-teal-500/40 group shadow-inner">
+                    {!photoLoadError ? (
+                      <>
+                        <img
+                          src={userPhoto}
+                          alt={`${PROFILE.name} - ${PROFILE.title}`}
+                          onError={() => setPhotoLoadError(true)}
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                        />
 
-                    {/* Agent Graphic Icon */}
-                    <div className="relative z-10 w-24 h-24 rounded-2xl bg-gradient-to-tr from-teal-400 to-blue-600 p-[1.5px] shadow-lg shadow-teal-500/20 mb-2">
-                      <div className="w-full h-full rounded-[15px] bg-slate-950 flex items-center justify-center">
-                        <Bot className="w-12 h-12 text-teal-400" />
+                        {/* Hover Overlay with Change / Update CTA */}
+                        <div
+                          className="absolute inset-0 bg-slate-950/75 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 p-4 text-center cursor-pointer z-20"
+                          onClick={handleTriggerUpload}
+                          title="Click to select or change your exact photo"
+                        >
+                          <Camera className="w-6 h-6 text-teal-300" />
+                          <span className="text-xs font-semibold text-white">Select Exact Photo</span>
+                          <span className="text-[10px] font-mono text-teal-300">Click or drop 77867.jpeg</span>
+                        </div>
+
+                        {/* Gradient Overlay with Name & Title */}
+                        <div className="absolute inset-x-0 bottom-0 pt-10 pb-3.5 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-transparent flex flex-col items-center justify-center text-center px-4 pointer-events-none group-hover:opacity-0 transition-opacity z-10">
+                          <span className="font-heading font-bold text-white text-sm sm:text-base leading-tight drop-shadow-md">
+                            {PROFILE.name}
+                          </span>
+                          <span className="text-[11px] text-teal-300 font-mono font-medium drop-shadow-sm">
+                            {PROFILE.title}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      /* Prompt to load exact image when file path is waiting for file input */
+                      <div className="w-full h-full bg-gradient-to-b from-slate-900 to-slate-950 p-4 flex flex-col items-center justify-center text-center">
+                        <div className="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center mb-2 text-teal-400">
+                          <UploadCloud className="w-6 h-6" />
+                        </div>
+                        <span className="font-bold text-white text-xs sm:text-sm font-heading">
+                          Set Real Photo
+                        </span>
+                        <p className="text-[10px] text-slate-400 mt-0.5 mb-2.5 max-w-[180px] leading-tight">
+                          Select your exact photo (<span className="text-teal-300 font-mono">77867.jpeg</span>)
+                        </p>
+                        <button
+                          onClick={handleTriggerUpload}
+                          className="px-3.5 py-1.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-teal-500/25 transition-all"
+                        >
+                          <Camera className="w-3.5 h-3.5" />
+                          <span>Select Exact Photo</span>
+                        </button>
                       </div>
-                    </div>
-
-                    <span className="relative z-10 font-heading font-bold text-white text-base">
-                      {PROFILE.name}
-                    </span>
-                    <span className="relative z-10 text-xs text-teal-400 font-mono">
-                      Agentic AI Engineer
-                    </span>
-
-                    {/* Placeholder replacement notice badge */}
-                    <div className="absolute bottom-2 px-3 py-0.5 rounded-full bg-slate-900/90 border border-slate-700 text-[10px] text-slate-400 font-mono tracking-tight">
-                      Photo Placeholder
-                    </div>
+                    )}
                   </div>
                 </div>
 
@@ -982,30 +1116,74 @@ export default function App() {
             <div className="w-16 h-1 bg-gradient-to-r from-teal-400 to-blue-600 mx-auto mt-4 rounded-full" />
           </div>
 
-          {/* Bio Text Card */}
+          {/* Bio Text Card with Profile Photo */}
           <div
             className={`max-w-4xl mx-auto p-8 sm:p-10 rounded-3xl border backdrop-blur-xl mb-12 shadow-lg transition-all ${
               isDark ? 'glass-panel-dark' : 'glass-panel-light'
             }`}
           >
-            {/* Bio Content - Editable Placeholder */}
-            <p
-              className={`text-base sm:text-lg leading-relaxed ${
-                isDark ? 'text-slate-300' : 'text-slate-700'
-              }`}
-            >
-              {PROFILE.bio}
-            </p>
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
+              {/* Photo Frame */}
+              <div className="relative shrink-0 group">
+                <div
+                  className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl p-1 bg-gradient-to-tr from-teal-400 via-blue-500 to-indigo-600 shadow-xl overflow-hidden cursor-pointer"
+                  onClick={handleTriggerUpload}
+                  title="Click to select or update your exact photo"
+                >
+                  {!photoLoadError ? (
+                    <img
+                      src={userPhoto}
+                      alt={PROFILE.name}
+                      onError={() => setPhotoLoadError(true)}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover object-top rounded-[20px]"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-[20px] bg-slate-900 flex flex-col items-center justify-center text-center p-2 text-teal-300">
+                      <Camera className="w-6 h-6 mb-1 text-teal-400" />
+                      <span className="text-[10px] font-mono font-bold">Select Photo</span>
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={handleTriggerUpload}
+                  className="absolute -bottom-2 -right-2 px-2.5 py-1 rounded-xl bg-slate-900/90 border border-teal-500/40 backdrop-blur-md text-[10px] font-mono font-semibold text-teal-300 hover:bg-teal-500 hover:text-slate-950 transition-colors flex items-center gap-1 shadow-md"
+                  title="Upload exact photo"
+                >
+                  <Camera className="w-3 h-3" />
+                  <span>Exact Photo</span>
+                </button>
+              </div>
 
-            <div className="mt-6 pt-6 border-t border-slate-700/40 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-slate-400">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-teal-400" />
-                Available for worldwide remote contracts
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-blue-400" />
-                Rapid prototyping & agile milestone turnarounds
-              </span>
+              {/* Bio Content */}
+              <div className="flex-1 text-center sm:text-left">
+                <div className="mb-3">
+                  <h3 className="text-xl sm:text-2xl font-bold font-heading">
+                    {PROFILE.name}
+                  </h3>
+                  <p className="text-xs font-mono text-teal-400 font-medium">
+                    {PROFILE.title} • Available Worldwide
+                  </p>
+                </div>
+                <p
+                  className={`text-base leading-relaxed ${
+                    isDark ? 'text-slate-300' : 'text-slate-700'
+                  }`}
+                >
+                  {PROFILE.bio}
+                </p>
+
+                <div className="mt-6 pt-5 border-t border-slate-700/40 flex flex-wrap items-center justify-center sm:justify-start gap-4 text-xs font-mono text-slate-400">
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-teal-400" />
+                    Available for freelance & contract projects
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-blue-400" />
+                    Rapid turnarounds & milestone deliveries
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1566,6 +1744,42 @@ export default function App() {
                   Have a specific workflow bottleneck or looking to deploy an autonomous AI agent for your business? Send a message to get started right away.
                 </p>
 
+                {/* Direct Availability & Photo Badge */}
+                <div
+                  className={`flex items-center gap-3.5 p-3 rounded-2xl border max-w-md ${
+                    isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+                  }`}
+                >
+                  <div
+                    className="relative w-12 h-12 rounded-2xl overflow-hidden shrink-0 border border-teal-500/40 cursor-pointer"
+                    onClick={handleTriggerUpload}
+                    title="Click to update exact photo"
+                  >
+                    {!photoLoadError ? (
+                      <img
+                        src={userPhoto}
+                        alt={PROFILE.name}
+                        onError={() => setPhotoLoadError(true)}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover object-top"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-slate-800 flex items-center justify-center text-teal-400">
+                        <Camera className="w-5 h-5" />
+                      </div>
+                    )}
+                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-teal-400 ring-2 ring-slate-900" />
+                  </div>
+                  <div className="text-xs">
+                    <p className={`font-semibold ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+                      {PROFILE.name}
+                    </p>
+                    <p className="font-mono text-[11px] text-teal-400 font-medium">
+                      Direct WhatsApp & Email • Quick Response
+                    </p>
+                  </div>
+                </div>
+
                 {/* Primary Direct CTAs */}
                 <div className="flex flex-wrap gap-4 pt-2">
                   <a
@@ -1878,8 +2092,21 @@ export default function App() {
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-teal-400 to-blue-600 flex items-center justify-center text-slate-950 shadow-sm font-bold">
-                    <Bot className="w-4 h-4 text-slate-950" />
+                  <div className="relative w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-teal-500/40">
+                    {!photoLoadError ? (
+                      <img
+                        src={userPhoto}
+                        alt={PROFILE.name}
+                        onError={() => setPhotoLoadError(true)}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover object-top"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-slate-800 flex items-center justify-center text-teal-400">
+                        <Bot className="w-4 h-4" />
+                      </div>
+                    )}
+                    <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-teal-400 ring-1 ring-slate-900" />
                   </div>
                   <div>
                     <h4 className="font-heading font-bold text-sm leading-none flex items-center gap-1.5">
