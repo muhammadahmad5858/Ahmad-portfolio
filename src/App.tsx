@@ -45,10 +45,7 @@ import {
   UserCheck,
   ArrowRight,
   Linkedin,
-  Github,
-  Camera,
-  UploadCloud,
-  RotateCcw
+  Github
 } from 'lucide-react';
 
 /* =========================================================================
@@ -64,7 +61,7 @@ const PROFILE = {
   whatsappUrl: 'https://wa.me/923706357435',
   githubUrl: 'https://github.com/muhammadahmad5858',
   githubUsername: 'muhammadahmad5858',
-  defaultPhotoUrl: '/77867.jpeg',
+  photoUrl: '/77867.jpeg',
   
   // Tagline (editable)
   tagline: 'I design and build autonomous AI agents and automation systems that save businesses time and money.',
@@ -395,37 +392,32 @@ export default function App() {
   const [contactFormName, setContactFormName] = useState<string>('');
   const [contactFormDetails, setContactFormDetails] = useState<string>('');
 
-  // User's Real Photo management (using exact user image 77867.jpeg without AI modification)
+  // Exact User Photo (permanently set to 77867.jpeg without AI modifications)
   const [userPhoto, setUserPhoto] = useState<string>(() => {
-    return localStorage.getItem('muhammad_real_photo') || PROFILE.defaultPhotoUrl;
+    return localStorage.getItem('muhammad_real_photo') || PROFILE.photoUrl;
   });
   const [photoLoadError, setPhotoLoadError] = useState<boolean>(false);
-  const [photoUploadSuccess, setPhotoUploadSuccess] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handlePhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (dataUrl) {
-        setUserPhoto(dataUrl);
-        setPhotoLoadError(false);
-        try {
-          localStorage.setItem('muhammad_real_photo', dataUrl);
-        } catch (err) {
-          console.warn('Storage quota', err);
+  // Silent drag-and-drop handler for user convenience (no UI buttons)
+  const handleSilentPhotoDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const dataUrl = ev.target?.result as string;
+        if (dataUrl) {
+          setUserPhoto(dataUrl);
+          setPhotoLoadError(false);
+          try {
+            localStorage.setItem('muhammad_real_photo', dataUrl);
+          } catch (err) {
+            console.warn('Storage quota', err);
+          }
         }
-        setPhotoUploadSuccess('Exact photo applied across your entire portfolio!');
-        setTimeout(() => setPhotoUploadSuccess(null), 4000);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleTriggerUpload = () => {
-    fileInputRef.current?.click();
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // Floating AI Assistant Widget state (Step 8)
@@ -565,31 +557,6 @@ export default function App() {
         isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
       } relative overflow-x-hidden`}
     >
-      {/* Hidden File Input for uploading exact photo */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handlePhotoFileChange}
-        className="hidden"
-        id="exact-photo-file-input"
-      />
-
-      {/* Toast Notification for Exact Photo Update */}
-      <AnimatePresence>
-        {photoUploadSuccess && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl bg-teal-500 text-slate-950 font-bold text-xs sm:text-sm flex items-center gap-2.5 shadow-2xl shadow-teal-500/40 border border-teal-300"
-          >
-            <CheckCircle2 className="w-4 h-4 text-slate-950" />
-            <span>{photoUploadSuccess}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Background Ambient Glow & Geometric Balance Grid */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <div
@@ -639,15 +606,7 @@ export default function App() {
             className="flex items-center gap-2.5 group focus:outline-none"
             aria-label="Muhammad Ahmad Home"
           >
-            <div
-              className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-teal-400 via-blue-600 to-indigo-600 p-[1.5px] shadow-md shadow-teal-500/20 group-hover:shadow-teal-400/30 transition-all overflow-hidden shrink-0"
-              onClick={(e) => {
-                // If user clicks on avatar in navbar, also let them trigger photo picker
-                e.stopPropagation();
-                handleTriggerUpload();
-              }}
-              title="Click to set/update your exact photo"
-            >
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-teal-400 via-blue-600 to-indigo-600 p-[1.5px] shadow-md shadow-teal-500/20 group-hover:shadow-teal-400/30 transition-all overflow-hidden shrink-0">
               {!photoLoadError ? (
                 <img
                   src={userPhoto}
@@ -990,30 +949,9 @@ export default function App() {
                       : 'bg-white/90 border-slate-200 shadow-teal-500/10'
                   }`}
                   onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const file = e.dataTransfer.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (ev) => {
-                        const dataUrl = ev.target?.result as string;
-                        if (dataUrl) {
-                          setUserPhoto(dataUrl);
-                          setPhotoLoadError(false);
-                          try {
-                            localStorage.setItem('muhammad_real_photo', dataUrl);
-                          } catch (err) {
-                            console.warn('Storage quota', err);
-                          }
-                          setPhotoUploadSuccess('Exact photo applied across your entire portfolio!');
-                          setTimeout(() => setPhotoUploadSuccess(null), 4000);
-                        }
-                      };
-                      reader.readAsDataURL(file);
-                    }
-                  }}
+                  onDrop={handleSilentPhotoDrop}
                 >
-                  {/* Real Portrait Photo or Direct Upload Fallback */}
+                  {/* Real Portrait Photo Frame */}
                   <div className="w-full h-full rounded-full relative overflow-hidden border-2 border-teal-500/40 group shadow-inner">
                     {!photoLoadError ? (
                       <>
@@ -1025,19 +963,8 @@ export default function App() {
                           className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
                         />
 
-                        {/* Hover Overlay with Change / Update CTA */}
-                        <div
-                          className="absolute inset-0 bg-slate-950/75 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 p-4 text-center cursor-pointer z-20"
-                          onClick={handleTriggerUpload}
-                          title="Click to select or change your exact photo"
-                        >
-                          <Camera className="w-6 h-6 text-teal-300" />
-                          <span className="text-xs font-semibold text-white">Select Exact Photo</span>
-                          <span className="text-[10px] font-mono text-teal-300">Click or drop 77867.jpeg</span>
-                        </div>
-
                         {/* Gradient Overlay with Name & Title */}
-                        <div className="absolute inset-x-0 bottom-0 pt-10 pb-3.5 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-transparent flex flex-col items-center justify-center text-center px-4 pointer-events-none group-hover:opacity-0 transition-opacity z-10">
+                        <div className="absolute inset-x-0 bottom-0 pt-10 pb-3.5 bg-gradient-to-t from-slate-950/95 via-slate-950/60 to-transparent flex flex-col items-center justify-center text-center px-4 pointer-events-none z-10">
                           <span className="font-heading font-bold text-white text-sm sm:text-base leading-tight drop-shadow-md">
                             {PROFILE.name}
                           </span>
@@ -1047,24 +974,17 @@ export default function App() {
                         </div>
                       </>
                     ) : (
-                      /* Prompt to load exact image when file path is waiting for file input */
-                      <div className="w-full h-full bg-gradient-to-b from-slate-900 to-slate-950 p-4 flex flex-col items-center justify-center text-center">
-                        <div className="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center mb-2 text-teal-400">
-                          <UploadCloud className="w-6 h-6" />
+                      /* Monogram Fallback when Image is Resolving */
+                      <div className="w-full h-full bg-gradient-to-br from-slate-900 via-slate-950 to-teal-950 flex flex-col items-center justify-center text-center p-4">
+                        <div className="w-16 h-16 rounded-2xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-300 font-bold text-2xl font-heading mb-2">
+                          MA
                         </div>
-                        <span className="font-bold text-white text-xs sm:text-sm font-heading">
-                          Set Real Photo
+                        <span className="font-heading font-bold text-white text-sm sm:text-base font-heading">
+                          {PROFILE.name}
                         </span>
-                        <p className="text-[10px] text-slate-400 mt-0.5 mb-2.5 max-w-[180px] leading-tight">
-                          Select your exact photo (<span className="text-teal-300 font-mono">77867.jpeg</span>)
-                        </p>
-                        <button
-                          onClick={handleTriggerUpload}
-                          className="px-3.5 py-1.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-teal-500/25 transition-all"
-                        >
-                          <Camera className="w-3.5 h-3.5" />
-                          <span>Select Exact Photo</span>
-                        </button>
+                        <span className="text-[11px] text-teal-400 font-mono mt-0.5">
+                          {PROFILE.title}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -1124,12 +1044,8 @@ export default function App() {
           >
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
               {/* Photo Frame */}
-              <div className="relative shrink-0 group">
-                <div
-                  className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl p-1 bg-gradient-to-tr from-teal-400 via-blue-500 to-indigo-600 shadow-xl overflow-hidden cursor-pointer"
-                  onClick={handleTriggerUpload}
-                  title="Click to select or update your exact photo"
-                >
+              <div className="relative shrink-0">
+                <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl p-1 bg-gradient-to-tr from-teal-400 via-blue-500 to-indigo-600 shadow-xl overflow-hidden">
                   {!photoLoadError ? (
                     <img
                       src={userPhoto}
@@ -1139,20 +1055,14 @@ export default function App() {
                       className="w-full h-full object-cover object-top rounded-[20px]"
                     />
                   ) : (
-                    <div className="w-full h-full rounded-[20px] bg-slate-900 flex flex-col items-center justify-center text-center p-2 text-teal-300">
-                      <Camera className="w-6 h-6 mb-1 text-teal-400" />
-                      <span className="text-[10px] font-mono font-bold">Select Photo</span>
+                    <div className="w-full h-full rounded-[20px] bg-slate-900 flex flex-col items-center justify-center text-center p-2 text-teal-300 font-heading font-bold text-xl">
+                      MA
                     </div>
                   )}
                 </div>
-                <button
-                  onClick={handleTriggerUpload}
-                  className="absolute -bottom-2 -right-2 px-2.5 py-1 rounded-xl bg-slate-900/90 border border-teal-500/40 backdrop-blur-md text-[10px] font-mono font-semibold text-teal-300 hover:bg-teal-500 hover:text-slate-950 transition-colors flex items-center gap-1 shadow-md"
-                  title="Upload exact photo"
-                >
-                  <Camera className="w-3 h-3" />
-                  <span>Exact Photo</span>
-                </button>
+                <div className="absolute -bottom-2 -right-2 px-2.5 py-1 rounded-xl bg-teal-500/20 border border-teal-500/40 backdrop-blur-md text-[10px] font-mono font-semibold text-teal-300">
+                  AI Dev
+                </div>
               </div>
 
               {/* Bio Content */}
@@ -1750,11 +1660,7 @@ export default function App() {
                     isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
                   }`}
                 >
-                  <div
-                    className="relative w-12 h-12 rounded-2xl overflow-hidden shrink-0 border border-teal-500/40 cursor-pointer"
-                    onClick={handleTriggerUpload}
-                    title="Click to update exact photo"
-                  >
+                  <div className="relative w-12 h-12 rounded-2xl overflow-hidden shrink-0 border border-teal-500/40">
                     {!photoLoadError ? (
                       <img
                         src={userPhoto}
@@ -1764,8 +1670,8 @@ export default function App() {
                         className="w-full h-full object-cover object-top"
                       />
                     ) : (
-                      <div className="w-full h-full bg-slate-800 flex items-center justify-center text-teal-400">
-                        <Camera className="w-5 h-5" />
+                      <div className="w-full h-full bg-slate-800 flex items-center justify-center text-teal-400 font-bold text-xs font-heading">
+                        MA
                       </div>
                     )}
                     <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-teal-400 ring-2 ring-slate-900" />
